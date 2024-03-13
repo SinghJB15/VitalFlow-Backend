@@ -67,6 +67,10 @@ const fetchFitbitHeartrate = async(req, res) => {
             message: "Failed to fetch user heartrate"
         })
     }
+
+const createFitbitFoodLog = async(req, res) => {
+    
+}
 }
 
 

@@ -33,7 +33,11 @@ const UserSchema = new mongoose.Schema({
         type: Date,
         default: null,
         select: false
-    }
+    },
+    journals: [{
+        type: mongoose.Schema.Types.ObjectId,
+        ref: "FoodJournal"
+    }]
 })
 
 const Users = mongoose.model("Users", UserSchema);
