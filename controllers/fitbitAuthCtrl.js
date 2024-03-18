@@ -40,7 +40,7 @@ const handleFitbitRedirect = async(req, res) => {
 
     //Store access tokens to variable
     const { access_token, refresh_token, expires_in } = response.data;
-    // console.log('Session:', req.session);
+    console.log('Session:', req.session);
     const userId = req.session.currentUser?.id;  // Using optional chaining to avoid crashing
     if (!userId) {
     return res.status(400).json({ message: "Session or user ID is missing" });
@@ -54,7 +54,7 @@ const handleFitbitRedirect = async(req, res) => {
         fitbitTokenExpiration: new Date(Date.now() + expires_in * 1000)
     }, {new: true})
 
-    res.redirect("http://localhost:3000/fitbit");
+    res.redirect("http://localhost:3000/login");
 
    } catch(error) {
     console.error("Error exchanging authorization code:", error);

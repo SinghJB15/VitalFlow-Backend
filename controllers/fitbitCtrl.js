@@ -54,7 +54,7 @@ const fetchFitbitHeartrate = async(req, res) => {
 
     //Fetch users heart rate data
     try {
-        const response = await axios.get("https://api.fitbit.com/1/user/-/hrv/date/2024-03-11.json", {
+        const response = await axios.get("https://api.fitbit.com/1/user/-/activities/heart/date/today/1d.json", {
             headers: {Authorization: `Bearer ${accessToken}`}
         });
         return res.status(200).json({
@@ -67,11 +67,50 @@ const fetchFitbitHeartrate = async(req, res) => {
             message: "Failed to fetch user heartrate"
         })
     }
+}
 
-const createFitbitFoodLog = async(req, res) => {
-    
+const fetchFitbitEcg = async(req, res) => {
+    const user = await Users.findById(req.session.currentUser.id).select('+fitbitAccessToken');
+    const accessToken = user.fitbitAccessToken;
+
+    //Fetch users heart rate data
+    try {
+        const response = await axios.get("https://api.fitbit.com/1/user/-/ecg/list.json?beforeDate=2024-03-15&sort=desc&limit=1&offset=0", {
+            headers: {Authorization: `Bearer ${accessToken}`}
+        });
+        return res.status(200).json({
+            message: "User ECG fetched successfully",
+            data: response.data
+        })
+    } catch(error) {
+        console.error("Error fetching user ECG:", error);
+        res.status(500).json({
+            message: "Failed to fetch user ECG"
+        })
+    }
 }
+
+const fetchFitbitActivities = async(req, res) => {
+    const user = await Users.findById(req.session.currentUser.id).select('+fitbitAccessToken');
+    const accessToken = user.fitbitAccessToken;
+
+    //Fetch users heart rate data
+    try {
+        const response = await axios.get("https://api.fitbit.com/1/user/-/activities/date/today.json", {
+            headers: {Authorization: `Bearer ${accessToken}`}
+        });
+        return res.status(200).json({
+            message: "User activities fetched successfully",
+            data: response.data
+        })
+    } catch(error) {
+        console.error("Error fetching user activities:", error);
+        res.status(500).json({
+            message: "Failed to fetch user activities"
+        })
+    }
 }
+
 
 
 //
@@ -79,5 +118,7 @@ const createFitbitFoodLog = async(req, res) => {
 module.exports = {
     fetchFitbitProfile,
     fetchFitbitDevices,
-    fetchFitbitHeartrate
+    fetchFitbitHeartrate,
+    fetchFitbitEcg,
+    fetchFitbitActivities
 };

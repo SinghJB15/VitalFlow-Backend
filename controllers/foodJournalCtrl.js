@@ -1,6 +1,5 @@
 const express = require("express");
 const FoodJournal = require("../models/FoodJournal");
-const MealEntry = require("../models/MealEntry");
 const Users = require("../models/Users");
 
 //Create journal
@@ -10,13 +9,16 @@ const createJournal = async (req, res) => {
     }
   
     try {
-      const { date } = req.body;
+      const { date, breakfast, lunch, dinner, snacks } = req.body;
 
       //Create the journal entry
       const newJournal = await FoodJournal.create({
         user: req.session.currentUser.id,
         date,
-        meals: []
+        breakfast,
+        lunch,
+        dinner,
+        snacks
       });
 
       //Update the users database with the new journal
@@ -37,18 +39,27 @@ const createJournal = async (req, res) => {
 
   //Edit Journal
   const editJournalDate = async (req, res) => {
-    const { journalId } = req.params;
-    const { newDate } = req.body;
-    
+    const journalId = req.params.id;
+    console.log("journalId:", journalId);
+    const { date, breakfast, lunch, dinner, snacks } = req.body;
+
+    //Manually calculate total calories
+    const totalCalories = Number(breakfast) + Number(lunch) + Number(dinner) + Number(snacks);
+
     //Find journal by id and update
     try {
-      const updatedJournal = await FoodJournal.findByIdAndUpdate(journalId, 
-        { date: newDate }, { new: true });
+      const updatedJournal = await FoodJournal.findByIdAndUpdate(journalId, {
+        date,
+        breakfast,
+        lunch,
+        dinner,
+        snacks,
+        totalCalories
+      }, {new: true});
 
         //Success
         res.status(200).json({
             message: "Journal entry added successfully",
-            data: updatedJournal
         });
     } catch (error) {
       res.status(500).json({ message: "Error updating journal date", error });
@@ -57,11 +68,12 @@ const createJournal = async (req, res) => {
 
   //Delete Journal
   const deleteJournal = async (req, res) => {
-    const { journalId } = req.params;
+    const journalId = req.params.id;
+    console.log("journalId:", journalId)
     
     //Find journal id and delete
     try {
-      const deletedJournalEntry = await FoodJournal.findByIdAndDelete(id);
+      const deletedJournalEntry = await FoodJournal.findByIdAndDelete(journalId);
 
       if(!deletedJournalEntry) {
         return res.status(404).json ({ message: "Journal entry not found"})
@@ -89,7 +101,7 @@ const createJournal = async (req, res) => {
     //Find journals specific to user id
     try {
         const journals = await FoodJournal.find(
-            { user: req.session.currentUser.id }).populate("meals")
+            { user: req.session.currentUser.id });
 
         //Success
         res.status(200).json({

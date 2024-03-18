@@ -43,8 +43,22 @@ const session = async(req, res) => {
     }
 }
 
+//Check if session exists
+const verifySession = (req, res) => {
+    if(req.session.user) {
+        res.json({
+            isLoggedIn: true,
+            user: req.session.user
+        });
+        console.log("Verify-session:", req.session);
+    } else {
+        res.json({isLoggedIn: false});
+    }
+}
+
 //Delete session after user logs out
 const deleteSession = (req, res) => {
+    console.log("session:", req.session);
     req.session.destroy((err) => {
         if(err) {
             return res.status(400).json({ message: "Error destroying the session" });
@@ -58,5 +72,6 @@ const deleteSession = (req, res) => {
 module.exports = {
     findUserByUsername,
     session,
+    verifySession,
     deleteSession
 };
